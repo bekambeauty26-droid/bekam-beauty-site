@@ -219,14 +219,13 @@ function criarCard(linha) {
           linkSeguro
             ? `
               <a
-                class="botao"
-                href="${linkSeguro}"
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                aria-label="Ver produto ${nome}"
-              >
-                Ver produto
-              </a>
+  class="botao"
+  href="${link}"
+  target="_blank"
+  rel="noopener noreferrer sponsored"
+>
+  Ver produto
+</a>
             `
             : `
               <div class="botao indisponivel">
