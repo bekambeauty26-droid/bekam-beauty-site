@@ -9,6 +9,25 @@ function normalizar(valor) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+function normalizarSubpagina(valor) {
+  const nome = normalizar(valor);
+
+  const equivalencias = {
+    "feminino": "femininos",
+    "femininos": "femininos",
+
+    "masculino": "masculinos",
+    "masculinos": "masculinos",
+
+    "kit presente": "kits presente",
+    "kit presentes": "kits presente",
+    "kits presente": "kits presente",
+    "kits presentes": "kits presente"
+  };
+
+  return equivalencias[nome] || nome;
+}
+
 function escaparHTML(valor) {
   return String(valor || "")
     .replaceAll("&", "&amp;")
@@ -95,7 +114,6 @@ function criarCard(linha) {
 
   return `
     <article class="card">
-
       ${
         imagem
           ? `
@@ -111,10 +129,7 @@ function criarCard(linha) {
       }
 
       <div class="conteudo">
-
-        <div class="nome">
-          ${nome}
-        </div>
+        <div class="nome">${nome}</div>
 
         ${
           descricao
@@ -142,7 +157,6 @@ function criarCard(linha) {
             `
             : ""
         }
-
       </div>
     </article>
   `;
@@ -161,7 +175,7 @@ const PAGINA =
   normalizar(paginaInformada);
 
 const SUBPAGINA =
-  normalizar(subpaginaInformada);
+  normalizarSubpagina(subpaginaInformada);
 
 async function carregarProdutos() {
   const mensagem =
@@ -174,14 +188,12 @@ async function carregarProdutos() {
     console.error(
       'Os elementos com id="mensagem" e id="produtos" não foram encontrados.'
     );
-
     return;
   }
 
   if (!PAGINA || !SUBPAGINA) {
     mensagem.textContent =
       "Página ou subpágina não informada no endereço.";
-
     return;
   }
 
@@ -222,7 +234,7 @@ async function carregarProdutos() {
             normalizar(linha[7]);
 
           const subpagina =
-            normalizar(linha[8]);
+            normalizarSubpagina(linha[8]);
 
           return (
             ativo === "sim" &&
@@ -236,7 +248,6 @@ async function carregarProdutos() {
         `Nenhum produto encontrado em ${paginaInformada} / ${subpaginaInformada}.`;
 
       container.innerHTML = "";
-
       return;
     }
 
