@@ -82,12 +82,13 @@ function criarCard(linha) {
         ${preco ? `<div class="preco">${preco}</div>` : ""}
 
         <a
-          class="botao"
-          href="${link}"
-          rel="noopener noreferrer"
-        >
-          Ver produto
-        </a>
+  class="botao"
+  href="${link}"
+  target="_top"
+  rel="noopener noreferrer"
+>
+  Ver produto
+</a>
       </div>
     </article>
   `;
