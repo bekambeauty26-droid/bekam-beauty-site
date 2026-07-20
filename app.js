@@ -1,6 +1,10 @@
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qRpptfpc-QhZnNK2NfjGxCFeRBpbWgeb-zFX7PRWLYJXnHIWIKnFKVTV71r5Voj7S2L2s1lFWBDe/pub?gid=0&single=true&output=csv";
 
+/* =====================================================
+   NORMALIZAÇÃO DE TEXTOS
+===================================================== */
+
 function normalizar(valor) {
   return String(valor || "")
     .trim()
@@ -13,11 +17,11 @@ function normalizarSubpagina(valor) {
   const nome = normalizar(valor);
 
   const equivalencias = {
-    "feminino": "femininos",
-    "femininos": "femininos",
+    feminino: "femininos",
+    femininos: "femininos",
 
-    "masculino": "masculinos",
-    "masculinos": "masculinos",
+    masculino: "masculinos",
+    masculinos: "masculinos",
 
     "kit presente": "kits presente",
     "kit presentes": "kits presente",
@@ -28,6 +32,10 @@ function normalizarSubpagina(valor) {
   return equivalencias[nome] || nome;
 }
 
+/* =====================================================
+   SEGURANÇA DO HTML
+===================================================== */
+
 function escaparHTML(valor) {
   return String(valor || "")
     .replaceAll("&", "&amp;")
@@ -36,6 +44,48 @@ function escaparHTML(valor) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/* =====================================================
+   TRATAMENTO DOS LINKS DOS PRODUTOS
+===================================================== */
+
+function prepararLink(valor) {
+  let link = String(valor || "")
+    .trim()
+    .replace(/^'+/, "")
+    .replace(/\s+/g, "");
+
+  if (!link) {
+    return "";
+  }
+
+  if (
+    !link.startsWith("https://") &&
+    !link.startsWith("http://")
+  ) {
+    link = `https://${link}`;
+  }
+
+  try {
+    const endereco = new URL(link);
+
+    if (
+      endereco.protocol !== "https:" &&
+      endereco.protocol !== "http:"
+    ) {
+      return "";
+    }
+
+    return endereco.href;
+  } catch (erro) {
+    console.warn("Link inválido encontrado:", valor);
+    return "";
+  }
+}
+
+/* =====================================================
+   LEITURA DO CSV
+===================================================== */
 
 function lerCSV(texto) {
   const linhas = [];
@@ -63,7 +113,8 @@ function lerCSV(texto) {
       linha.push(campo);
       campo = "";
     } else if (
-      (caractere === "\n" || caractere === "\r") &&
+      (caractere === "\n" ||
+        caractere === "\r") &&
       !dentroAspas
     ) {
       if (
@@ -105,15 +156,25 @@ function lerCSV(texto) {
   return linhas;
 }
 
+/* =====================================================
+   CRIAÇÃO DOS CARDS
+===================================================== */
+
 function criarCard(linha) {
   const nome = escaparHTML(linha[1]);
   const preco = escaparHTML(linha[2]);
   const imagem = escaparHTML(linha[3]);
-  const link = escaparHTML(linha[4]);
   const descricao = escaparHTML(linha[5]);
+
+  const linkProduto =
+    prepararLink(linha[4]);
+
+  const linkSeguro =
+    escaparHTML(linkProduto);
 
   return `
     <article class="card">
+
       ${
         imagem
           ? `
@@ -129,41 +190,64 @@ function criarCard(linha) {
       }
 
       <div class="conteudo">
-        <div class="nome">${nome}</div>
+
+        <div class="nome">
+          ${nome}
+        </div>
 
         ${
           descricao
-            ? `<div class="descricao">${descricao}</div>`
+            ? `
+              <div class="descricao">
+                ${descricao}
+              </div>
+            `
             : ""
         }
 
         ${
           preco
-            ? `<div class="preco">${preco}</div>`
+            ? `
+              <div class="preco">
+                ${preco}
+              </div>
+            `
             : ""
         }
 
         ${
-          link
+          linkSeguro
             ? `
               <a
                 class="botao"
-                href="${link}"
-                target="_top"
-                rel="noopener noreferrer"
+                href="${linkSeguro}"
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                aria-label="Ver produto ${nome}"
               >
                 Ver produto
               </a>
             `
-            : ""
+            : `
+              <div class="botao indisponivel">
+                Link indisponível
+              </div>
+            `
         }
+
       </div>
     </article>
   `;
 }
 
+/* =====================================================
+   PARÂMETROS DA URL
+===================================================== */
+
 const parametros =
-  new URLSearchParams(window.location.search);
+  new URLSearchParams(
+    window.location.search
+  );
 
 const paginaInformada =
   parametros.get("pagina") || "";
@@ -175,7 +259,13 @@ const PAGINA =
   normalizar(paginaInformada);
 
 const SUBPAGINA =
-  normalizarSubpagina(subpaginaInformada);
+  normalizarSubpagina(
+    subpaginaInformada
+  );
+
+/* =====================================================
+   CARREGAMENTO DOS PRODUTOS
+===================================================== */
 
 async function carregarProdutos() {
   const mensagem =
@@ -234,7 +324,9 @@ async function carregarProdutos() {
             normalizar(linha[7]);
 
           const subpagina =
-            normalizarSubpagina(linha[8]);
+            normalizarSubpagina(
+              linha[8]
+            );
 
           return (
             ativo === "sim" &&
@@ -257,7 +349,6 @@ async function carregarProdutos() {
         .join("");
 
     mensagem.style.display = "none";
-
   } catch (erro) {
     console.error(erro);
 
