@@ -25,39 +25,60 @@ function lerCSV(texto) {
   let dentroAspas = false;
 
   for (let i = 0; i < texto.length; i++) {
-    const c = texto[i];
-    const prox = texto[i + 1];
+    const caractere = texto[i];
+    const proximo = texto[i + 1];
 
-    if (c === '"' && dentroAspas && prox === '"') {
+    if (
+      caractere === '"' &&
+      dentroAspas &&
+      proximo === '"'
+    ) {
       campo += '"';
       i++;
-    } else if (c === '"') {
+    } else if (caractere === '"') {
       dentroAspas = !dentroAspas;
-    } else if (c === "," && !dentroAspas) {
+    } else if (
+      caractere === "," &&
+      !dentroAspas
+    ) {
       linha.push(campo);
       campo = "";
-    } else if ((c === "\n" || c === "\r") && !dentroAspas) {
-      if (c === "\r" && prox === "\n") {
+    } else if (
+      (caractere === "\n" || caractere === "\r") &&
+      !dentroAspas
+    ) {
+      if (
+        caractere === "\r" &&
+        proximo === "\n"
+      ) {
         i++;
       }
 
       linha.push(campo);
 
-      if (linha.some(item => String(item).trim() !== "")) {
+      if (
+        linha.some(
+          item => String(item).trim() !== ""
+        )
+      ) {
         linhas.push(linha);
       }
 
       linha = [];
       campo = "";
     } else {
-      campo += c;
+      campo += caractere;
     }
   }
 
   if (campo.length || linha.length) {
     linha.push(campo);
 
-    if (linha.some(item => String(item).trim() !== "")) {
+    if (
+      linha.some(
+        item => String(item).trim() !== ""
+      )
+    ) {
       linhas.push(linha);
     }
   }
@@ -74,222 +95,158 @@ function criarCard(linha) {
 
   return `
     <article class="card">
+
       ${
         imagem
           ? `
-        <img
-          src="${imagem}"
-          alt="${nome}"
-          loading="lazy"
-          referrerpolicy="no-referrer"
-          onerror="this.style.display='none'"
-        >
-      `
+            <img
+              src="${imagem}"
+              alt="${nome}"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              onerror="this.style.display='none'"
+            >
+          `
           : ""
       }
 
       <div class="conteudo">
-        <div class="nome">${nome}</div>
 
-        ${descricao ? `<div class="descricao">${descricao}</div>` : ""}
-        ${preco ? `<div class="preco">${preco}</div>` : ""}
+        <div class="nome">
+          ${nome}
+        </div>
+
+        ${
+          descricao
+            ? `<div class="descricao">${descricao}</div>`
+            : ""
+        }
+
+        ${
+          preco
+            ? `<div class="preco">${preco}</div>`
+            : ""
+        }
 
         ${
           link
             ? `
-          <a
-            class="botao"
-            href="${link}"
-            target="_top"
-            rel="noopener noreferrer"
-          >
-            Ver produto
-          </a>
-        `
+              <a
+                class="botao"
+                href="${link}"
+                target="_top"
+                rel="noopener noreferrer"
+              >
+                Ver produto
+              </a>
+            `
             : ""
         }
+
       </div>
     </article>
   `;
 }
 
-const params = new URLSearchParams(window.location.search);
+const parametros =
+  new URLSearchParams(window.location.search);
 
-const paginaInformada = params.get("pagina") || "";
-const subpaginaInformada = params.get("subpagina") || "";
+const paginaInformada =
+  parametros.get("pagina") || "";
 
-const PAGINA = normalizar(paginaInformada);
-const SUBPAGINA = normalizar(subpaginaInformada);
-const textosPaginas = {
-  "perfumes|feminino": {
-    titulo: "Perfumes Femininos",
-    subtitulo: "Fragrâncias especiais para todos os momentos."
-  },
+const subpaginaInformada =
+  parametros.get("subpagina") || "";
 
-  "perfumes|femininos": {
-    titulo: "Perfumes Femininos",
-    subtitulo: "Fragrâncias especiais para todos os momentos."
-  },
+const PAGINA =
+  normalizar(paginaInformada);
 
-  "perfumes|masculino": {
-    titulo: "Perfumes Masculinos",
-    subtitulo: "Fragrâncias marcantes para todos os estilos."
-  },
+const SUBPAGINA =
+  normalizar(subpaginaInformada);
 
-  "perfumes|masculinos": {
-    titulo: "Perfumes Masculinos",
-    subtitulo: "Fragrâncias marcantes para todos os estilos."
-  },
-
-  "perfumes|mais vendidos": {
-    titulo: "Perfumes Mais Vendidos",
-    subtitulo: "Os perfumes preferidos e mais procurados."
-  },
-
-  "perfumes|kit presentes": {
-    titulo: "Kits Presente",
-    subtitulo: "Opções especiais para presentear quem você ama."
-  },
-
-  "perfumes|kits presente": {
-    titulo: "Kits Presente",
-    subtitulo: "Opções especiais para presentear quem você ama."
-  },
-
-  "maquiagem|rosto": {
-    titulo: "Maquiagem para o Rosto",
-    subtitulo: "Produtos para realçar sua beleza todos os dias."
-  },
-
-  "maquiagem|olhos e labios": {
-    titulo: "Olhos e Lábios",
-    subtitulo: "Cores e produtos para destacar seu olhar e seu sorriso."
-  },
-
-  "maquiagem|unhas": {
-    titulo: "Produtos para Unhas",
-    subtitulo: "Cores, cuidados e beleza para suas unhas."
-  },
-
-  "maquiagem|acessorios": {
-    titulo: "Acessórios de Maquiagem",
-    subtitulo: "Acessórios práticos para completar sua rotina de beleza."
-  },
-
-  "skincare|limpeza": {
-    titulo: "Limpeza da Pele",
-    subtitulo: "Cuidados essenciais para uma pele limpa e saudável."
-  },
-
-  "skincare|hidratacao": {
-    titulo: "Hidratação da Pele",
-    subtitulo: "Produtos para manter sua pele macia e hidratada."
-  },
-
-  "skincare|tratamentos": {
-    titulo: "Tratamentos para a Pele",
-    subtitulo: "Cuidados especiais para diferentes necessidades da pele."
-  },
-
-  "skincare|protetor solar": {
-    titulo: "Protetor Solar",
-    subtitulo: "Proteção diária para uma pele bonita e bem cuidada."
-  },
-
-  "cabelos|shampoo/condicionador": {
-    titulo: "Shampoo e Condicionador",
-    subtitulo: "Limpeza, cuidado e maciez para seus cabelos."
-  },
-
-  "cabelos|mascaras": {
-    titulo: "Máscaras para Cabelos",
-    subtitulo: "Tratamentos intensivos para fios mais fortes e hidratados."
-  },
-
-  "cabelos|oleos": {
-    titulo: "Óleos para Cabelos",
-    subtitulo: "Brilho, proteção e nutrição para os fios."
-  },
-
-  "cabelos|acessorios": {
-    titulo: "Acessórios para Cabelos",
-    subtitulo: "Praticidade e cuidado para sua rotina capilar."
-  }
-};
-
-function atualizarCabecalho() {
-  const tituloElemento = document.getElementById("tituloPagina");
-  const subtituloElemento = document.getElementById("subtituloPagina");
-
-  const chave = `${PAGINA}|${SUBPAGINA}`;
-  const texto = textosPaginas[chave];
-
-  if (texto) {
-    tituloElemento.textContent = texto.titulo;
-    subtituloElemento.textContent = texto.subtitulo;
-  } else {
-    tituloElemento.textContent =
-      `${paginaInformada} - ${subpaginaInformada}`;
-
-    subtituloElemento.textContent =
-      "Confira os produtos selecionados para você.";
-  }
-}
-
-atualizarCabecalho();
 async function carregarProdutos() {
-  const mensagem = document.getElementById("mensagem");
-  const container = document.getElementById("produtos");
+  const mensagem =
+    document.getElementById("mensagem");
+
+  const container =
+    document.getElementById("produtos");
 
   if (!mensagem || !container) {
     console.error(
       'Os elementos com id="mensagem" e id="produtos" não foram encontrados.'
     );
+
     return;
   }
 
   if (!PAGINA || !SUBPAGINA) {
     mensagem.textContent =
       "Página ou subpágina não informada no endereço.";
+
     return;
   }
 
   try {
-    const resposta = await fetch(`${CSV_URL}&v=${Date.now()}`, {
-      cache: "no-store"
-    });
+    const resposta = await fetch(
+      `${CSV_URL}&v=${Date.now()}`,
+      {
+        cache: "no-store"
+      }
+    );
 
     if (!resposta.ok) {
-      throw new Error(`Erro HTTP ${resposta.status}`);
+      throw new Error(
+        `Erro HTTP ${resposta.status}`
+      );
     }
 
-    const texto = await resposta.text();
-    const linhas = lerCSV(texto);
+    const texto =
+      await resposta.text();
+
+    const linhas =
+      lerCSV(texto);
 
     if (linhas.length < 2) {
-      throw new Error("A planilha não retornou produtos.");
+      throw new Error(
+        "A planilha não retornou produtos."
+      );
     }
 
-    const produtos = linhas.slice(1).filter(linha => {
-      const ativo = normalizar(linha[6]);
-      const pagina = normalizar(linha[7]);
-      const subpagina = normalizar(linha[8]);
+    const produtos =
+      linhas
+        .slice(1)
+        .filter(linha => {
+          const ativo =
+            normalizar(linha[6]);
 
-      return (
-        ativo === "sim" &&
-        pagina === PAGINA &&
-        subpagina === SUBPAGINA
-      );
-    });
+          const pagina =
+            normalizar(linha[7]);
+
+          const subpagina =
+            normalizar(linha[8]);
+
+          return (
+            ativo === "sim" &&
+            pagina === PAGINA &&
+            subpagina === SUBPAGINA
+          );
+        });
 
     if (!produtos.length) {
       mensagem.textContent =
         `Nenhum produto encontrado em ${paginaInformada} / ${subpaginaInformada}.`;
+
+      container.innerHTML = "";
+
       return;
     }
 
-    container.innerHTML = produtos.map(criarCard).join("");
+    container.innerHTML =
+      produtos
+        .map(criarCard)
+        .join("");
+
     mensagem.style.display = "none";
+
   } catch (erro) {
     console.error(erro);
 
