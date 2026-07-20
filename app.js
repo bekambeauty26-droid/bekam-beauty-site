@@ -120,7 +120,123 @@ const subpaginaInformada = params.get("subpagina") || "";
 
 const PAGINA = normalizar(paginaInformada);
 const SUBPAGINA = normalizar(subpaginaInformada);
+const textosPaginas = {
+  "perfumes|feminino": {
+    titulo: "Perfumes Femininos",
+    subtitulo: "Fragrâncias especiais para todos os momentos."
+  },
 
+  "perfumes|femininos": {
+    titulo: "Perfumes Femininos",
+    subtitulo: "Fragrâncias especiais para todos os momentos."
+  },
+
+  "perfumes|masculino": {
+    titulo: "Perfumes Masculinos",
+    subtitulo: "Fragrâncias marcantes para todos os estilos."
+  },
+
+  "perfumes|masculinos": {
+    titulo: "Perfumes Masculinos",
+    subtitulo: "Fragrâncias marcantes para todos os estilos."
+  },
+
+  "perfumes|mais vendidos": {
+    titulo: "Perfumes Mais Vendidos",
+    subtitulo: "Os perfumes preferidos e mais procurados."
+  },
+
+  "perfumes|kit presentes": {
+    titulo: "Kits Presente",
+    subtitulo: "Opções especiais para presentear quem você ama."
+  },
+
+  "perfumes|kits presente": {
+    titulo: "Kits Presente",
+    subtitulo: "Opções especiais para presentear quem você ama."
+  },
+
+  "maquiagem|rosto": {
+    titulo: "Maquiagem para o Rosto",
+    subtitulo: "Produtos para realçar sua beleza todos os dias."
+  },
+
+  "maquiagem|olhos e labios": {
+    titulo: "Olhos e Lábios",
+    subtitulo: "Cores e produtos para destacar seu olhar e seu sorriso."
+  },
+
+  "maquiagem|unhas": {
+    titulo: "Produtos para Unhas",
+    subtitulo: "Cores, cuidados e beleza para suas unhas."
+  },
+
+  "maquiagem|acessorios": {
+    titulo: "Acessórios de Maquiagem",
+    subtitulo: "Acessórios práticos para completar sua rotina de beleza."
+  },
+
+  "skincare|limpeza": {
+    titulo: "Limpeza da Pele",
+    subtitulo: "Cuidados essenciais para uma pele limpa e saudável."
+  },
+
+  "skincare|hidratacao": {
+    titulo: "Hidratação da Pele",
+    subtitulo: "Produtos para manter sua pele macia e hidratada."
+  },
+
+  "skincare|tratamentos": {
+    titulo: "Tratamentos para a Pele",
+    subtitulo: "Cuidados especiais para diferentes necessidades da pele."
+  },
+
+  "skincare|protetor solar": {
+    titulo: "Protetor Solar",
+    subtitulo: "Proteção diária para uma pele bonita e bem cuidada."
+  },
+
+  "cabelos|shampoo/condicionador": {
+    titulo: "Shampoo e Condicionador",
+    subtitulo: "Limpeza, cuidado e maciez para seus cabelos."
+  },
+
+  "cabelos|mascaras": {
+    titulo: "Máscaras para Cabelos",
+    subtitulo: "Tratamentos intensivos para fios mais fortes e hidratados."
+  },
+
+  "cabelos|oleos": {
+    titulo: "Óleos para Cabelos",
+    subtitulo: "Brilho, proteção e nutrição para os fios."
+  },
+
+  "cabelos|acessorios": {
+    titulo: "Acessórios para Cabelos",
+    subtitulo: "Praticidade e cuidado para sua rotina capilar."
+  }
+};
+
+function atualizarCabecalho() {
+  const tituloElemento = document.getElementById("tituloPagina");
+  const subtituloElemento = document.getElementById("subtituloPagina");
+
+  const chave = `${PAGINA}|${SUBPAGINA}`;
+  const texto = textosPaginas[chave];
+
+  if (texto) {
+    tituloElemento.textContent = texto.titulo;
+    subtituloElemento.textContent = texto.subtitulo;
+  } else {
+    tituloElemento.textContent =
+      `${paginaInformada} - ${subpaginaInformada}`;
+
+    subtituloElemento.textContent =
+      "Confira os produtos selecionados para você.";
+  }
+}
+
+atualizarCabecalho();
 async function carregarProdutos() {
   const mensagem = document.getElementById("mensagem");
   const container = document.getElementById("produtos");
