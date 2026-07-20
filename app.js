@@ -1,4 +1,6 @@
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qRpptfpc-QhZnNK2NfjGxCFeRBpbWgeb-zFX7PRWLYJXnHIWIKnFKVTV71r5Voj7S2L2s1lFWBDe/pub?gid=0&single=true&output=csv";
+const CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qRpptfpc-QhZnNK2NfjGxCFeRBpbWgeb-zFX7PRWLYJXnHIWIKnFKVTV71r5Voj7S2L2s1lFWBDe/pub?gid=0&single=true&output=csv";
+
 function normalizar(valor) {
   return String(valor || "")
     .trim()
@@ -35,7 +37,10 @@ function lerCSV(texto) {
       linha.push(campo);
       campo = "";
     } else if ((c === "\n" || c === "\r") && !dentroAspas) {
-      if (c === "\r" && prox === "\n") i++;
+      if (c === "\r" && prox === "\n") {
+        i++;
+      }
+
       linha.push(campo);
 
       if (linha.some(item => String(item).trim() !== "")) {
@@ -51,7 +56,10 @@ function lerCSV(texto) {
 
   if (campo.length || linha.length) {
     linha.push(campo);
-    linhas.push(linha);
+
+    if (linha.some(item => String(item).trim() !== "")) {
+      linhas.push(linha);
+    }
   }
 
   return linhas;
@@ -66,7 +74,9 @@ function criarCard(linha) {
 
   return `
     <article class="card">
-      ${imagem ? `
+      ${
+        imagem
+          ? `
         <img
           src="${imagem}"
           alt="${nome}"
@@ -74,29 +84,59 @@ function criarCard(linha) {
           referrerpolicy="no-referrer"
           onerror="this.style.display='none'"
         >
-      ` : ""}
+      `
+          : ""
+      }
 
       <div class="conteudo">
         <div class="nome">${nome}</div>
+
         ${descricao ? `<div class="descricao">${descricao}</div>` : ""}
         ${preco ? `<div class="preco">${preco}</div>` : ""}
 
-        <a
-  class="botao"
-  href="${link}"
-  target="_top"
-  rel="noopener noreferrer"
->
-  Ver produto
-</a>
+        ${
+          link
+            ? `
+          <a
+            class="botao"
+            href="${link}"
+            target="_top"
+            rel="noopener noreferrer"
+          >
+            Ver produto
+          </a>
+        `
+            : ""
+        }
       </div>
     </article>
   `;
 }
 
+const params = new URLSearchParams(window.location.search);
+
+const paginaInformada = params.get("pagina") || "";
+const subpaginaInformada = params.get("subpagina") || "";
+
+const PAGINA = normalizar(paginaInformada);
+const SUBPAGINA = normalizar(subpaginaInformada);
+
 async function carregarProdutos() {
   const mensagem = document.getElementById("mensagem");
   const container = document.getElementById("produtos");
+
+  if (!mensagem || !container) {
+    console.error(
+      'Os elementos com id="mensagem" e id="produtos" não foram encontrados.'
+    );
+    return;
+  }
+
+  if (!PAGINA || !SUBPAGINA) {
+    mensagem.textContent =
+      "Página ou subpágina não informada no endereço.";
+    return;
+  }
 
   try {
     const resposta = await fetch(`${CSV_URL}&v=${Date.now()}`, {
@@ -119,21 +159,24 @@ async function carregarProdutos() {
       const pagina = normalizar(linha[7]);
       const subpagina = normalizar(linha[8]);
 
-      return ativo === "sim"
-        && pagina === "perfumes"
-        && (subpagina === "femininos" || subpagina === "feminino");
+      return (
+        ativo === "sim" &&
+        pagina === PAGINA &&
+        subpagina === SUBPAGINA
+      );
     });
 
     if (!produtos.length) {
-      mensagem.textContent = "Nenhum perfume feminino encontrado.";
+      mensagem.textContent =
+        `Nenhum produto encontrado em ${paginaInformada} / ${subpaginaInformada}.`;
       return;
     }
 
     container.innerHTML = produtos.map(criarCard).join("");
     mensagem.style.display = "none";
-
   } catch (erro) {
     console.error(erro);
+
     mensagem.innerHTML =
       "Não foi possível carregar os produtos.<br>" +
       "Confira se a aba Produtos continua publicada na web em formato CSV.";
