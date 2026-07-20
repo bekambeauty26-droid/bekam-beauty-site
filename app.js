@@ -1,5 +1,4 @@
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qRpptfpc-QhZnNK2NfjGxCFeRbpbWgeb-zFX7PRWLYJXnHIWIKnFKVTV71r5Voi7S2L2s1IEWBDe/pub?gid=0&single=true&output=csv";
-
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qRpptfpc-QhZnNK2NfjGxCFeRBpbWgeb-zFX7PRWLYJXnHIWIKnFKVTV71r5Voj7S2L2s1lFWBDe/pub?gid=0&single=true&output=csv";
 function normalizar(valor) {
   return String(valor || "")
     .trim()
