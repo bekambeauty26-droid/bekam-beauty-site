@@ -84,7 +84,6 @@ function criarCard(linha) {
         <a
           class="botao"
           href="${link}"
-          target="_blank"
           rel="noopener noreferrer"
         >
           Ver produto
