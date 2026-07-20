@@ -52,8 +52,7 @@ function escaparHTML(valor) {
 function prepararLink(valor) {
   let link = String(valor || "")
     .trim()
-    .replace(/^'+/, "")
-    .replace(/\s+/g, "");
+    .replace(/^'+/, "");
 
   if (!link) {
     return "";
@@ -78,7 +77,11 @@ function prepararLink(valor) {
 
     return endereco.href;
   } catch (erro) {
-    console.warn("Link inválido encontrado:", valor);
+    console.warn(
+      "Link inválido encontrado:",
+      valor
+    );
+
     return "";
   }
 }
@@ -89,6 +92,7 @@ function prepararLink(valor) {
 
 function lerCSV(texto) {
   const linhas = [];
+
   let linha = [];
   let campo = "";
   let dentroAspas = false;
@@ -113,8 +117,10 @@ function lerCSV(texto) {
       linha.push(campo);
       campo = "";
     } else if (
-      (caractere === "\n" ||
-        caractere === "\r") &&
+      (
+        caractere === "\n" ||
+        caractere === "\r"
+      ) &&
       !dentroAspas
     ) {
       if (
@@ -128,7 +134,8 @@ function lerCSV(texto) {
 
       if (
         linha.some(
-          item => String(item).trim() !== ""
+          item =>
+            String(item).trim() !== ""
         )
       ) {
         linhas.push(linha);
@@ -146,7 +153,8 @@ function lerCSV(texto) {
 
     if (
       linha.some(
-        item => String(item).trim() !== ""
+        item =>
+          String(item).trim() !== ""
       )
     ) {
       linhas.push(linha);
@@ -161,10 +169,17 @@ function lerCSV(texto) {
 ===================================================== */
 
 function criarCard(linha) {
-  const nome = escaparHTML(linha[1]);
-  const preco = escaparHTML(linha[2]);
-  const imagem = escaparHTML(linha[3]);
-  const descricao = escaparHTML(linha[5]);
+  const nome =
+    escaparHTML(linha[1]);
+
+  const preco =
+    escaparHTML(linha[2]);
+
+  const imagem =
+    escaparHTML(linha[3]);
+
+  const descricao =
+    escaparHTML(linha[5]);
 
   const linkProduto =
     prepararLink(linha[4]);
@@ -219,13 +234,13 @@ function criarCard(linha) {
           linkSeguro
             ? `
               <a
-  class="botao"
-  href="${link}"
-  target="_blank"
-  rel="noopener noreferrer sponsored"
->
-  Ver produto
-</a>
+                class="botao"
+                href="${linkSeguro}"
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+              >
+                Ver produto
+              </a>
             `
             : `
               <div class="botao indisponivel">
@@ -255,7 +270,9 @@ const subpaginaInformada =
   parametros.get("subpagina") || "";
 
 const PAGINA =
-  normalizar(paginaInformada);
+  normalizar(
+    paginaInformada
+  );
 
 const SUBPAGINA =
   normalizarSubpagina(
@@ -268,21 +285,29 @@ const SUBPAGINA =
 
 async function carregarProdutos() {
   const mensagem =
-    document.getElementById("mensagem");
+    document.getElementById(
+      "mensagem"
+    );
 
   const container =
-    document.getElementById("produtos");
+    document.getElementById(
+      "produtos"
+    );
 
   if (!mensagem || !container) {
     console.error(
       'Os elementos com id="mensagem" e id="produtos" não foram encontrados.'
     );
+
     return;
   }
 
   if (!PAGINA || !SUBPAGINA) {
     mensagem.textContent =
       "Página ou subpágina não informada no endereço.";
+
+    container.innerHTML = "";
+
     return;
   }
 
@@ -339,6 +364,7 @@ async function carregarProdutos() {
         `Nenhum produto encontrado em ${paginaInformada} / ${subpaginaInformada}.`;
 
       container.innerHTML = "";
+
       return;
     }
 
@@ -347,9 +373,16 @@ async function carregarProdutos() {
         .map(criarCard)
         .join("");
 
-    mensagem.style.display = "none";
+    mensagem.style.display =
+      "none";
+
   } catch (erro) {
     console.error(erro);
+
+    container.innerHTML = "";
+
+    mensagem.style.display =
+      "block";
 
     mensagem.innerHTML =
       "Não foi possível carregar os produtos.<br>" +
